@@ -11,7 +11,6 @@ let ID = 0;
 
 let ws;
 
-buildwebsocket();
 function buildwebsocket() {
     let HOST = location.origin.replace(/^http/, 'ws')
     ws = new WebSocket(HOST);
@@ -36,6 +35,8 @@ function buildwebsocket() {
     };
     ws.onerror = (evt) => { console.log('Connection error'); };
 }
+
+buildwebsocket();
 
 function send(message) {
     console.log("SENT: " + message); 
