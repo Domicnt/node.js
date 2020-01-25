@@ -54,7 +54,7 @@ wsServer.on('request', (request) => {
         console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
         return;
     }
-    let connection = request.accept('ws', request.origin);
+    let connection = request.accept('', request.origin);
 
     //store the new connection in your array of connections and send ID
     connections.push(connection);

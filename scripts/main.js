@@ -13,7 +13,8 @@ let ws;
 
 buildwebsocket();
 function buildwebsocket() {
-    ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
+    let HOST = location.origin.replace(/^http/, 'ws')
+    ws = new WebSocket(HOST);
     ws.onopen = (evt) => { console.log('Connected'); };
     ws.onclose = (evt) => { console.log('Connection closed'); };
     ws.onmessage = (evt) => {
