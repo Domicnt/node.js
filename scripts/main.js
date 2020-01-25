@@ -13,7 +13,7 @@ let ws;
 
 buildwebsocket();
 function buildwebsocket() {
-    ws = new WebSocket("ws://127.0.0.1:80", 'echo-protocol');
+    ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
     ws.onopen = (evt) => { console.log('Connected'); };
     ws.onclose = (evt) => { console.log('Connection closed'); };
     ws.onmessage = (evt) => {
