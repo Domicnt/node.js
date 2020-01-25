@@ -25,7 +25,7 @@ let server = http.createServer((request, response) => {
     });
 });
 
-server.listen(1337);
+server.listen(process.env.PORT || 80);
 
 
 
