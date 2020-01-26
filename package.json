@@ -2662,6 +2662,7 @@
       "resolved": "https://registry.npmjs.org/send/-/send-0.17.1.tgz",
       "version": "0.17.1"
     },
+    "serve-favicon": "^2.5.0",
     "serve-static": {
       "integrity": "sha512-JMrvUwE54emCYWlTI+hGrGv5I8dEwmco/00EvkzIIsR7MqrHonbD9pO2MOfFnpFntl7ecpZs+3mW+XbQZu9QCg==",
       "requires": {

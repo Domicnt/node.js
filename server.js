@@ -1,11 +1,9 @@
 const http = require('http');
 const path = require('path');
-const favicon = require('serve-favicon');
 const fs = require('fs');
 
 let WebSocketServer = require('websocket').server;
 let players = [[0, 0, 25, 0]];
-let _favicon = favicon(path.join(__dirname, 'public', 'favicon.ico'))
 let server = http.createServer((request, response) => {
     if (request.url === "/") {
         request.url = "/index.html";
