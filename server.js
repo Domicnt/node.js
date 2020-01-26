@@ -9,18 +9,22 @@ let server = http.createServer((request, response) => {
         request.url = "/index.html";
     }
     fs.readFile(__dirname + request.url, (error, data) => {
-        let fileTypes =
-        {
-            html: "text/html",
-            css: "text/css",
-            js: "application/javascript",
-            ico: 'image/png'
-        };
-        let fileType = request.url.split(".").pop();
-        if (fileType === 'html' || fileType === 'css' || fileType === 'js' || fileType === 'ico') {
-            response.writeHead(200, { 'Content-Type': fileTypes[fileType] });
-            response.write(data);
-
+        if (error) {
+            response.writeHead(404);
+            response.write('File Not Found');
+        } else {
+            let fileTypes =
+            {
+                html: "text/html",
+                css: "text/css",
+                js: "application/javascript",
+                ico: 'image/png'
+            };
+            let fileType = request.url.split(".").pop();
+            if (fileType === 'html' || fileType === 'css' || fileType === 'js' || fileType === 'ico') {
+                response.writeHead(200, { 'Content-Type': fileTypes[fileType], 'Content-Length': data.length });
+                response.write(data);
+            }
             response.end();
         }
     });
