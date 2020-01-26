@@ -11,7 +11,7 @@ let server = http.createServer((request, response) => {
     fs.readFile(__dirname + request.url, (error, data) => {
         if (error) {
             response.writeHead(404);
-            response.write('File Not Found');
+            response.write('File at url: ' + request.url + ' Not Found');
         } else {
             let fileTypes =
             {
