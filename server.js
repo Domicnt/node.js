@@ -19,8 +19,9 @@ let server = http.createServer((request, response) => {
         if (fileType === 'html' || fileType === 'css' || fileType === 'js') {
             response.writeHead(200, { 'Content-Type': fileTypes[fileType] });
             response.write(data);
+
+            response.end();
         }
-        response.end();
     });
 });
 
