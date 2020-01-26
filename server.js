@@ -13,7 +13,8 @@ let server = http.createServer((request, response) => {
         {
             html: "text/html",
             css: "text/css",
-            js: "application/javascript"
+            js: "application/javascript",
+            json: "application/json"
         };
         let fileType = request.url.split(".").pop();
         response.writeHead(200, { 'Content-Type': fileTypes[fileType] });
