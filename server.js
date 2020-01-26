@@ -25,8 +25,8 @@ let server = http.createServer((request, response) => {
                 response.writeHead(200, { 'Content-Type': fileTypes[fileType], 'Content-Length': data.length });
                 response.write(data);
             }
-            response.end();
         }
+        response.end();
     });
 });
 
