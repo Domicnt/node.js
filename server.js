@@ -66,7 +66,6 @@ wsServer.on('request', (request) => {
     console.log((new Date()) + ' Connection accepted.');
     connection.on('message', (message) => {
         if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
             let ID = message.utf8Data.split(':', 1);
             let str = message.utf8Data.split(':', 2)[1];
             if (str === 'W') {

@@ -30,8 +30,6 @@ function buildwebsocket() {
                 context.stroke();
             }
         }
-
-        console.log('Message: ' + evt.data);
     };
     ws.onerror = (evt) => { console.log('Connection error'); };
 }
@@ -39,7 +37,6 @@ function buildwebsocket() {
 buildwebsocket();
 
 function send(message) {
-    console.log("SENT: " + message); 
     ws.send(ID + ':' + message);
 }
 
