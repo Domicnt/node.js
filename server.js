@@ -1,9 +1,11 @@
 const http = require('http');
 const path = require('path');
+const favicon = require('serve-favicon');
 const fs = require('fs');
 
 let WebSocketServer = require('websocket').server;
-let players = [[0,0,25,0]];
+let players = [[0, 0, 25, 0]];
+let _favicon = favicon(path.join(__dirname, 'public', 'favicon.ico'))
 let server = http.createServer((request, response) => {
     if (request.url === "/") {
         request.url = "/index.html";
@@ -14,9 +16,10 @@ let server = http.createServer((request, response) => {
             html: "text/html",
             css: "text/css",
             js: "application/javascript",
+            ico: 'image/png'
         };
         let fileType = request.url.split(".").pop();
-        if (fileType === 'html' || fileType === 'css' || fileType === 'js') {
+        if (fileType === 'html' || fileType === 'css' || fileType === 'js' || fileType === 'ico') {
             response.writeHead(200, { 'Content-Type': fileTypes[fileType] });
             response.write(data);
 
