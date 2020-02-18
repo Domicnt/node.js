@@ -1,9 +1,7 @@
 const http = require('http');
-const path = require('path');
 const fs = require('fs');
 
 let WebSocketServer = require('websocket').server;
-let players = [[0, 0, 25, 0]];
 let server = http.createServer((request, response) => {
     if (request.url === "/") {
         request.url = "/index.html";
@@ -40,17 +38,79 @@ wsServer = new WebSocketServer({
 
 let connections = [];
 
-function updateClients() {
-    let str = '';
-    for (let i = 0; i < connections.length; i++) {
-        if (i > 0) str += '|';
-        for (let j = 0; j < 3; j++) {
-            if (j > 0) str += ':' + players[i][j];
-            else str += players[i][j];
+let arr = []; // 0 is unclicked and not mine, 1 is clicked, 2 is unclicked and mine, 3 is flag(unimplemented)
+let width = 20;
+let height = 20;
+arr.length = width * height;
+let mines = arr.length / 5;
+for (let i = 0; i < arr.length; i++) {
+    arr[i] = 0;
+}
+for (let i = 0; i < mines; i++) {
+    let f = Math.floor(Math.random() * arr.length);
+    if (arr[f] == 2) {
+        i--;
+        continue;
+    }
+    arr[f] = 2;
+}
+
+function adjacentMines(i, j) {
+    let mines = 0;
+    for (let k = -1; k <= 1; k++) {
+        for (let l = -1; l <= 1; l++) {
+            let x = i + k;
+            let y = j + l;
+            if (x < 0 || y < 0 || x >= width || y >= height) continue;
+            let f = (x + (y * width));
+            if (arr[f] == 2) mines++;
         }
     }
+    return mines;
+}
+
+function floodFill(i, j) {
+    if (adjacentMines(i, j) == 0) {
+        for (let k = -1; k <= 1; k++) {
+            for (let l = -1; l <= 1; l++) {
+                let x = i + k;
+                let y = j + l;
+                if (x < 0 || y < 0 || x >= width || y >= height) continue;
+                let f = (x + (y * width));
+                if (arr[f] == 0) {
+                    if (adjacentMines(x, y) == 0) {
+                        arr[f] = 1;
+                        floodFill(x, y);
+                    } else {
+                        arr[f] = 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function updateClients(message) {
+    let lose = false;
+    if (message != null) {
+        let xy = message.split(':');
+        let i = Number(xy[0]);
+        let j = Number(xy[1]);
+        if (arr[(i + (j * width))] == 2) {
+            lose = true;
+        } else {
+            arr[(i + (j * width))] = 1;
+            floodFill(i, j);
+        }
+    }
+    let win = true;
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] == 0) win = false;
+    }
     for (let i = 0; i < connections.length; i++) {
-        connections[i].sendUTF(str);
+        connections[i].sendUTF(JSON.stringify(arr));
+        if (lose) connections[i].send(0);
+        if (win) connections[i].send(1);
     }
 }
 
@@ -60,28 +120,13 @@ wsServer.on('request', (request) => {
     connections.push(connection);
     connections[connections.length - 1].sendUTF('ID:' + connections.length);
 
-    players.push([0, 0, 25, connections.length]);
     updateClients();
 
     console.log((new Date()) + ' Connection accepted.');
     connection.on('message', (message) => {
         if (message.type === 'utf8') {
-            let ID = message.utf8Data.split(':', 1);
-            let str = message.utf8Data.split(':', 2)[1];
-            if (str === 'W') {
-                players[ID - 1][1] -= 5;
-            }
-            if (str === 'S') {
-                players[ID - 1][1] += 5;
-            }
-            if (str === 'A') {
-                players[ID - 1][0] -= 5;
-            }
-            if (str === 'D') {
-                players[ID - 1][0] += 5;
-            }
+            updateClients(message.utf8Data);
         }
-        updateClients();
     });
     
     connection.on('close', (reasonCode, description) => {
