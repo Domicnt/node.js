@@ -38,21 +38,24 @@ wsServer = new WebSocketServer({
 
 let connections = [];
 
-let arr = []; // 0 is unclicked and not mine, 1 is clicked, 2 is unclicked and mine, 3 is flag(unimplemented)
-let width = 20;
-let height = 20;
+let arr = []; // 0 is unclicked and not mine, 1 is clicked, 2 is unclicked and mine, 3 is flag, 4 is flagged mine
+let width = 32;
+let height = 18;
 arr.length = width * height;
 let mines = arr.length / 5;
-for (let i = 0; i < arr.length; i++) {
-    arr[i] = 0;
-}
-for (let i = 0; i < mines; i++) {
-    let f = Math.floor(Math.random() * arr.length);
-    if (arr[f] == 2) {
-        i--;
-        continue;
+reset();
+function reset() {
+    for (let i = 0; i < arr.length; i++) {
+        arr[i] = 0;
     }
-    arr[f] = 2;
+    for (let i = 0; i < mines; i++) {
+        let f = Math.floor(Math.random() * arr.length);
+        if (arr[f] == 2) {
+            i--;
+            continue;
+        }
+        arr[f] = 2;
+    }
 }
 
 function adjacentMines(i, j) {
@@ -93,24 +96,41 @@ function floodFill(i, j) {
 function updateClients(message) {
     let lose = false;
     if (message != null) {
-        let xy = message.split(':');
-        let i = Number(xy[0]);
-        let j = Number(xy[1]);
-        if (arr[(i + (j * width))] == 2) {
-            lose = true;
+        if (message[0] == 'f') {
+            message = message.replace('f', '');
+            let xy = message.split(':');
+            let i = Number(xy[0]);
+            let j = Number(xy[1]);
+            if (arr[(i + (j * width))] == 0) arr[(i + (j * width))] = 3;
+            else if (arr[(i + (j * width))] == 2) arr[(i + (j * width))] = 4;
+            else if (arr[(i + (j * width))] == 3) arr[(i + (j * width))] = 0;
+            else if (arr[(i + (j * width))] == 4) arr[(i + (j * width))] = 2;
         } else {
-            arr[(i + (j * width))] = 1;
-            floodFill(i, j);
+            let xy = message.split(':');
+            let i = Number(xy[0]);
+            let j = Number(xy[1]);
+            if (arr[(i + (j * width))] == 2) {
+                lose = true;
+            } else {
+                arr[(i + (j * width))] = 1;
+                floodFill(i, j);
+            }
         }
     }
     let win = true;
     for (let i = 0; i < arr.length; i++) {
-        if (arr[i] == 0) win = false;
+        if (arr[i] == 0 || arr[i] == 3) win = false;
     }
     for (let i = 0; i < connections.length; i++) {
         connections[i].sendUTF(JSON.stringify(arr));
-        if (lose) connections[i].send(0);
-        if (win) connections[i].send(1);
+        if (lose) {
+            connections[i].send(0);
+            reset();
+        }
+        if (win) {
+            connections[i].send(1);
+            reset();
+        }
     }
 }
 
