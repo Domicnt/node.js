@@ -88,10 +88,12 @@ function draw(arr) {
                         if (arr[f] == 2 || arr[f] == 4) mines++;
                     }
                 }
-                context.fillStyle = "#FFFFFF";
-                let size = Math.min(width / w, height / h);
-                context.font = size + "px Comic Sans MS";
-                context.fillText(mines, i * width / w + (width/w/5), (j+1) * height / h - (height/h/10));//random jank to align text
+                if (mines != 0) {
+                    context.fillStyle = "#FFFFFF";
+                    let size = Math.min(width / w, height / h);
+                    context.font = size + "px Comic Sans MS";
+                    context.fillText(mines, i * width / w + (width / w / 5), (j + 1) * height / h - (height / h / 10));//random jank to align text
+                }
             } else if (arr[i + (j * w)] == 3 || arr[i + (j * w)] == 4) {
                 context.fillStyle = "#FF0000";
                 context.fillRect(i * width / w, j * height / h, width / w, height / h);
