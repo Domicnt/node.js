@@ -138,11 +138,11 @@ wsServer.on('request', (request) => {
     let connection = request.accept('', request.origin);
 
     connections.push(connection);
-    connections[connections.length - 1].sendUTF('ID:' + connections.length);
+    connections[connections.length - 1].sendUTF('ID: ' + connections.length);
 
     updateClients();
 
-    console.log((new Date()) + ' Connection accepted.');
+    console.log('Connection accepted at ' + (new Date()));
     connection.on('message', (message) => {
         if (message.type === 'utf8') {
             updateClients(message.utf8Data);
@@ -150,6 +150,6 @@ wsServer.on('request', (request) => {
     });
     
     connection.on('close', (reasonCode, description) => {
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+        console.log('Player' + connection.remoteAddress + ' disconnected at ' + (new Date()));
     });
 });
