@@ -111,7 +111,7 @@ function updateClients(message) {
             let j = Number(xy[1]);
             if (arr[(i + (j * width))] == 2) {
                 lose = true;
-            } else {
+            } else if (arr[(i + (j * width))] != 3 && arr[(i + (j * width))] != 4) {
                 arr[(i + (j * width))] = 1;
                 floodFill(i, j);
             }
