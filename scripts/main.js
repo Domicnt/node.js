@@ -76,8 +76,10 @@ function draw(arr) {
     for (let i = 0; i < w; i++) {
         for (let j = 0; j < h; j++) {
             if (arr[i + (j * w)] == 1) {
-                context.fillStyle = "#000000";
-                context.fillRect(i * width / w, j * height / h, width / w, height / h);
+                //empty square
+                let img = new Image();
+                img.src = 'images/empty.png';
+                context.drawImage(img, i * width / w, j * height / h, width / w, height / h);
                 let mines = 0;
                 for (let k = -1; k <= 1; k++) {
                     for (let l = -1; l <= 1; l++) {
@@ -89,21 +91,21 @@ function draw(arr) {
                     }
                 }
                 if (mines != 0) {
-                    context.fillStyle = "#FFFFFF";
+                    context.fillStyle = "#000000";
                     let size = Math.min(width / w, height / h);
                     context.font = size + "px Comic Sans MS";
                     context.fillText(mines, i * width / w + (width / w / 5), (j + 1) * height / h - (height / h / 10));//random jank to align text
                 }
             } else if (arr[i + (j * w)] == 3 || arr[i + (j * w)] == 4) {
-                context.fillStyle = "#FF0000";
-                context.fillRect(i * width / w, j * height / h, width / w, height / h);
+                //flagged square
+                let img = new Image();
+                img.src = 'images/flag.png';
+                context.drawImage(img, i * width / w, j * height / h, width / w, height / h);
             } else {
                 //blank square
                 let img = new Image();
-                img.src = '/images/blank.png';
-                context.drawImage(img, i * width / w, j * height / h);
-                //context.fillStyle = "#FFFFFF";
-                //context.fillRect(i * width / w, j * height / h, width / w, height / h);
+                img.src = 'images/blank.png';
+                context.drawImage(img, i * width / w, j * height / h, width / w, height / h);
             }
         }
     }

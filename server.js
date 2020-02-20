@@ -16,10 +16,11 @@ let server = http.createServer((request, response) => {
                 html: "text/html",
                 css: "text/css",
                 js: "application/javascript",
-                ico: 'image/png'
+                ico: 'image/png',
+                png: 'image/png'
             };
             let fileType = request.url.split(".").pop();
-            if (fileType === 'html' || fileType === 'css' || fileType === 'js' || fileType === 'ico') {
+            if (fileType === 'html' || fileType === 'css' || fileType === 'js' || fileType === 'ico' || fileType === 'png') {
                 response.writeHead(200, { 'Content-Type': fileTypes[fileType], 'Content-Length': data.length });
                 response.write(data);
             }
