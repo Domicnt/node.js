@@ -66,7 +66,7 @@ function adjacentMines(i, j) {
             let y = j + l;
             if (x < 0 || y < 0 || x >= width || y >= height) continue;
             let f = (x + (y * width));
-            if (arr[f] == 2) mines++;
+            if (arr[f] == 2 || arr[f] == 4) mines++;
         }
     }
     return mines;
