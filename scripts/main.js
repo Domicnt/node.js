@@ -1,5 +1,5 @@
 let canvas = document.getElementById('canvas');
-let context = document.getElementById('canvas').getContext('2d');
+let context = canvas.getContext('2d');
 
 let width = window.innerWidth - 2;
 let height = window.innerHeight - 4;
@@ -98,8 +98,12 @@ function draw(arr) {
                 context.fillStyle = "#FF0000";
                 context.fillRect(i * width / w, j * height / h, width / w, height / h);
             } else {
-                context.fillStyle = "#FFFFFF";
-                context.fillRect(i * width / w, j * height / h, width / w, height / h);
+                //blank square
+                let img = new Image();
+                img.src = '/images/blank.png';
+                context.drawImage(img, i * width / w, j * height / h);
+                //context.fillStyle = "#FFFFFF";
+                //context.fillRect(i * width / w, j * height / h, width / w, height / h);
             }
         }
     }

@@ -138,7 +138,6 @@ wsServer.on('request', (request) => {
     let connection = request.accept('', request.origin);
 
     connections.push(connection);
-    connections[connections.length - 1].sendUTF('ID: ' + connections.length);
 
     updateClients();
 
