@@ -80,6 +80,22 @@ let blank = new Image();
 blank.src = 'images/blank.png';
 let flag = new Image();
 flag.src = 'images/flag.png';
+let one = new Image();
+one.src = 'images/1.png';
+let two = new Image();
+two.src = 'images/2.png';
+let three = new Image();
+three.src = 'images/3.png';
+let four = new Image();
+four.src = 'images/4.png';
+let five = new Image();
+five.src = 'images/5.png';
+let six = new Image();
+six.src = 'images/6.png';
+let seven = new Image();
+seven.src = 'images/7.png';
+let eight = new Image();
+eight.src = 'images/8.png';
 
 function draw(arr) {
     //clear screen
@@ -90,8 +106,6 @@ function draw(arr) {
     for (let i = 0; i < w; i++) {
         for (let j = 0; j < h; j++) {
             if (arr[i + (j * w)] == 1) {
-                //empty square
-                context.drawImage(empty, i * width / w, j * height / h, width / w, height / h);
                 let mines = 0;
                 for (let k = -1; k <= 1; k++) {
                     for (let l = -1; l <= 1; l++) {
@@ -102,11 +116,34 @@ function draw(arr) {
                         if (arr[f] == 2 || arr[f] == 4) mines++;
                     }
                 }
-                if (mines != 0) {
-                    context.fillStyle = "#000000";
-                    let size = Math.min(width / w, height / h);
-                    context.font = size + "px Comic Sans MS";
-                    context.fillText(mines, i * width / w + (width / w / 5), (j + 1) * height / h - (height / h / 10));//random jank to align text
+                switch (mines) {
+                    case 0:
+                        context.drawImage(empty, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 1:
+                        context.drawImage(one, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 2:
+                        context.drawImage(two, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 3:
+                        context.drawImage(three, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 4:
+                        context.drawImage(four, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 5:
+                        context.drawImage(five, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 6:
+                        context.drawImage(six, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 7:
+                        context.drawImage(seven, i * width / w, j * height / h, width / w, height / h);
+                        break;
+                    case 8:
+                        context.drawImage(eight, i * width / w, j * height / h, width / w, height / h);
+                        break;
                 }
             } else if (arr[i + (j * w)] == 3 || arr[i + (j * w)] == 4) {
                 //flagged square
