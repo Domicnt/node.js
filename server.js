@@ -95,6 +95,7 @@ function floodFill(i, j) {
 }
 
 function updateClients(message) {
+    if (connections.length == 0) return;
     let lose = false;
     if (message != null) {
         if (message[0] == 'f') {
@@ -123,14 +124,14 @@ function updateClients(message) {
         if (arr[i] == 0 || arr[i] == 3) win = false;
     }
     for (let i = 0; i < connections.length; i++) {
-        connections[i].sendUTF(JSON.stringify(arr));
         if (lose) {
             connections[i].send(0);
             reset();
-        }
-        if (win) {
+        } else if (win) {
             connections[i].send(1);
             reset();
+        } else {
+            connections[i].sendUTF(JSON.stringify(arr));
         }
     }
 }
@@ -140,7 +141,7 @@ wsServer.on('request', (request) => {
 
     connections.push(connection);
 
-    updateClients();
+    connection.sendUTF(JSON.stringify(arr));
 
     console.log('Connection accepted at ' + (new Date()));
     connection.on('message', (message) => {

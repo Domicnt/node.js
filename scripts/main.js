@@ -1,8 +1,8 @@
 let canvas = document.getElementById('canvas');
 let context = canvas.getContext('2d');
 
-let width = window.innerWidth - 2;
-let height = window.innerHeight - 4;
+let width = window.innerWidth;
+let height = window.innerHeight;
 
 context.canvas.width = width;
 context.canvas.height = height;
@@ -37,7 +37,9 @@ let ws;
 function buildwebsocket() {
     let HOST = window.origin.replace(/^http/, 'ws')
     ws = new WebSocket(HOST);
-    ws.onopen = (evt) => { console.log('Connected'); };
+    ws.onopen = (evt) => {
+        console.log('Connected');
+    };
     ws.onclose = (evt) => { console.log('Connection closed'); };
     ws.onmessage = (evt) => {
         if (evt.data[0] == 1) {
@@ -46,17 +48,16 @@ function buildwebsocket() {
             let size = Math.min(width / 3, height / 3);
             context.font = size + "px Comic Sans MS";
             context.fillText("You Win!", 0, height);
-            setTimeout(function () { send() }, 3000);
+            setTimeout(function () { send('') }, 3000);
         } else if (evt.data[0] == 0) {
             console.log("lose");
             context.fillStyle = "#000000";
             let size = Math.min(width / 3, height / 3);
             context.font = size + "px Comic Sans MS";
             context.fillText("You Lose!", 0, height);
-            setTimeout(function () { send() }, 3000);
+            setTimeout(function () { send('') }, 3000);
         } else {
-            let arr = JSON.parse(evt.data);
-            draw(arr);
+            setTimeout(function () { draw(JSON.parse(evt.data)) }, 50);
         }
     };
     ws.onerror = (evt) => { console.log('Connection error'); };
@@ -72,14 +73,25 @@ function close() {
     ws.close();
 }
 
+//load images
+let empty = new Image();
+empty.src = 'images/empty.png';
+let blank = new Image();
+blank.src = 'images/blank.png';
+let flag = new Image();
+flag.src = 'images/flag.png';
+
 function draw(arr) {
+    //clear screen
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, width, height);
+
+    //draw squares
     for (let i = 0; i < w; i++) {
         for (let j = 0; j < h; j++) {
             if (arr[i + (j * w)] == 1) {
                 //empty square
-                let img = new Image();
-                img.src = 'images/empty.png';
-                context.drawImage(img, i * width / w, j * height / h, width / w, height / h);
+                context.drawImage(empty, i * width / w, j * height / h, width / w, height / h);
                 let mines = 0;
                 for (let k = -1; k <= 1; k++) {
                     for (let l = -1; l <= 1; l++) {
@@ -98,17 +110,15 @@ function draw(arr) {
                 }
             } else if (arr[i + (j * w)] == 3 || arr[i + (j * w)] == 4) {
                 //flagged square
-                let img = new Image();
-                img.src = 'images/flag.png';
-                context.drawImage(img, i * width / w, j * height / h, width / w, height / h);
+                context.drawImage(flag, i * width / w, j * height / h, width / w, height / h);
             } else {
                 //blank square
-                let img = new Image();
-                img.src = 'images/blank.png';
-                context.drawImage(img, i * width / w, j * height / h, width / w, height / h);
+                context.drawImage(blank, i * width / w, j * height / h, width / w, height / h);
             }
         }
     }
+
+    //draw separating lines
     for (let i = 0; i < h; i++) {
         //horizontal lines
         context.fillStyle = "#000000";
