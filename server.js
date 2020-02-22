@@ -143,6 +143,10 @@ wsServer.on('request', (request) => {
 
     connection.sendUTF(JSON.stringify(arr));
 
+    for (let i = 0; i < connections.length; i++) {
+        connections[i].sendUTF('c' + connections.length);
+    }
+
     console.log('Connection accepted at ' + (new Date()));
     connection.on('message', (message) => {
         if (message.type === 'utf8') {
@@ -151,6 +155,11 @@ wsServer.on('request', (request) => {
     });
     
     connection.on('close', (reasonCode, description) => {
+        for (let i = 0; i < connections.length; i++) {
+            if (connection.remoteAddress == connections[i].remoteAddress) {
+                connections.splice(i, 1);
+            }
+        }
         console.log('Player' + connection.remoteAddress + ' disconnected at ' + (new Date()));
     });
 });

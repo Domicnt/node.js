@@ -13,6 +13,10 @@ let h = 18;
 let win = false;
 let lose = false;
 
+let playercount;
+
+let array = [];
+
 canvas.addEventListener('click', function () {
     let x = Math.floor(event.clientX / (width / w));
     let y = Math.floor(event.clientY / (height / h));
@@ -56,8 +60,13 @@ function buildwebsocket() {
             context.font = size + "px Comic Sans MS";
             context.fillText("You Lose!", 0, height);
             setTimeout(function () { send('') }, 3000);
+        } else if (evt.data[0] == 'c') {
+            let str = event.data.replace('c', '');
+            playercount = str;
+            setTimeout(function () { draw(array) }, 50);
         } else {
-            setTimeout(function () { draw(JSON.parse(evt.data)) }, 50);
+            array = JSON.parse(evt.data);
+            setTimeout(function () { draw(array) }, 50);
         }
     };
     ws.onerror = (evt) => { console.log('Connection error'); };
@@ -172,4 +181,10 @@ function draw(arr) {
         context.lineTo(i * width / w, height);
         context.stroke();
     }
+
+    //write player count
+    context.fillStyle = "#000000";
+    let size = Math.min(width / 20, height / 20);
+    context.font = size + "px Comic Sans MS";
+    context.fillText('Connected Players: ' + playercount, 0, size);
 }
