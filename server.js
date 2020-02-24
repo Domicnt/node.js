@@ -157,7 +157,7 @@ wsServer.on('request', (request) => {
     connection.on('close', (reasonCode, description) => {
         for (let i = 0; i < connections.length; i++) {
             if (connection.remoteAddress == connections[i].remoteAddress) {
-                connections.splice(i, 1);
+                //connections.splice(i, 1);
             }
         }
         console.log('Player' + connection.remoteAddress + ' disconnected at ' + (new Date()));
