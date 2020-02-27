@@ -4,3 +4,28 @@
     padding: 0px;
     background-color: #FFFFFF;
 }
+
+.sidebar {
+    height: 50%;
+    width: 20%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    opacity: .9;
+    border-bottom-right-radius: 10%;
+}
+
+.sidebar:hover {
+    opacity: .1;
+}
+
+.sidebar a {
+    padding: 5%;
+    background-color: #111;
+    text-decoration: none;
+    color: #FFF;
+    font-size: 150%;
+    display: block;
+}

@@ -1,7 +1,11 @@
 const http = require('http');
+const WebSocketServer = require('websocket').server;
 const fs = require('fs');
 
-let WebSocketServer = require('websocket').server;
+const mine = require('./scripts/mineSweeper.js');
+const scripts = require('./scripts/serverScripts.js');
+
+//create server
 let server = http.createServer((request, response) => {
     if (request.url === "/") {
         request.url = "/index.html";
@@ -31,117 +35,78 @@ let server = http.createServer((request, response) => {
 
 server.listen(process.env.PORT || 80);
 
-
-wsServer = new WebSocketServer({
+//create webSocket server with server
+wss = new WebSocketServer({
     httpServer: server,
     autoAcceptConnections: false
 });
 
+//array for connections
 let connections = [];
+let connectionIDs = [];
 
 let arr = []; // 0 is unclicked and not mine, 1 is clicked, 2 is unclicked and mine, 3 is flag, 4 is flagged mine
 let width = 32;
 let height = 18;
 arr.length = width * height;
 let mines = arr.length / 5;
-reset();
-function reset() {
-    for (let i = 0; i < arr.length; i++) {
-        arr[i] = 0;
-    }
-    for (let i = 0; i < mines; i++) {
-        let f = Math.floor(Math.random() * arr.length);
-        if (arr[f] == 2) {
-            i--;
-            continue;
-        }
-        arr[f] = 2;
-    }
-}
+mine.reset(arr, mines);
 
-function adjacentMines(i, j) {
-    let mines = 0;
-    for (let k = -1; k <= 1; k++) {
-        for (let l = -1; l <= 1; l++) {
-            let x = i + k;
-            let y = j + l;
-            if (x < 0 || y < 0 || x >= width || y >= height) continue;
-            let f = (x + (y * width));
-            if (arr[f] == 2 || arr[f] == 4) mines++;
-        }
-    }
-    return mines;
-}
-
-function floodFill(i, j) {
-    if (adjacentMines(i, j) == 0) {
-        for (let k = -1; k <= 1; k++) {
-            for (let l = -1; l <= 1; l++) {
-                let x = i + k;
-                let y = j + l;
-                if (x < 0 || y < 0 || x >= width || y >= height) continue;
-                let f = (x + (y * width));
-                if (arr[f] == 0) {
-                    if (adjacentMines(x, y) == 0) {
-                        arr[f] = 1;
-                        floodFill(x, y);
-                    } else {
-                        arr[f] = 1;
-                    }
-                }
-            }
-        }
-    }
-}
-
+//update clients after any change to the board
 function updateClients(message) {
     if (connections.length == 0) return;
     let lose = false;
+    let win = false;
+
+    let flagging = false;
     if (message != null) {
-        if (message[0] == 'f') {
-            message = message.replace('f', '');
-            let xy = message.split(':');
-            let i = Number(xy[0]);
-            let j = Number(xy[1]);
-            if (arr[(i + (j * width))] == 0) arr[(i + (j * width))] = 3;
-            else if (arr[(i + (j * width))] == 2) arr[(i + (j * width))] = 4;
-            else if (arr[(i + (j * width))] == 3) arr[(i + (j * width))] = 0;
-            else if (arr[(i + (j * width))] == 4) arr[(i + (j * width))] = 2;
+        if (message[0] == 'D') {
+            //disconnect
+            for (let i = 0; i < connections.length; i++) {
+                if (message.replace('D', '') == connectionIDs[i]) {
+                    connections.splice(i, 1);
+                    connectionIDs.splice(i, 1);
+                }
+            }
+            for (let i = 0; i < connections.length; i++) {
+                connections[i].sendUTF('c' + connections.length);
+            }
         } else {
+            if (message[0] == 'f') {
+                message = message.replace('f', '');
+                flagging = true
+            }
             let xy = message.split(':');
-            let i = Number(xy[0]);
-            let j = Number(xy[1]);
-            if (arr[(i + (j * width))] == 2) {
-                lose = true;
-            } else if (arr[(i + (j * width))] != 3 && arr[(i + (j * width))] != 4) {
-                arr[(i + (j * width))] = 1;
-                floodFill(i, j);
+            let output = mine.updateArr(arr, Number(xy[0]), Number(xy[1]), flagging, width, height);
+            if (output[0] == 100) win = true;
+            else if (output[0] == -100) lose = true;
+            else {
+                arr = output;
             }
         }
-    }
-    let win = true;
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i] == 0 || arr[i] == 3) win = false;
     }
     for (let i = 0; i < connections.length; i++) {
         if (lose) {
             connections[i].send(0);
-            reset();
+            arr = mine.reset(arr, mines);
         } else if (win) {
             connections[i].send(1);
-            reset();
+            arr = mine.reset(arr, mines);
         } else {
-            connections[i].sendUTF(JSON.stringify(arr));
+            connections[i].sendUTF(JSON.stringify(mine.returnArr(arr, width, height)));
         }
     }
 }
 
-wsServer.on('request', (request) => {
+wss.on('request', (request) => {
     let connection = request.accept('', request.origin);
+    let ID = scripts.createID();
 
     connections.push(connection);
+    connectionIDs.push(ID);
 
-    connection.sendUTF(JSON.stringify(arr));
+    connection.sendUTF('ID' + ID);
+    connection.sendUTF(JSON.stringify(mine.returnArr(arr, width, height)));
 
     for (let i = 0; i < connections.length; i++) {
         connections[i].sendUTF('c' + connections.length);
@@ -153,13 +118,8 @@ wsServer.on('request', (request) => {
             updateClients(message.utf8Data);
         }
     });
-    
+
     connection.on('close', (reasonCode, description) => {
-        for (let i = 0; i < connections.length; i++) {
-            if (connection.remoteAddress == connections[i].remoteAddress) {
-                //connections.splice(i, 1);
-            }
-        }
         console.log('Player' + connection.remoteAddress + ' disconnected at ' + (new Date()));
     });
 });
