@@ -40,7 +40,6 @@ function handleClick(event) {
 }
 
 function handleLeftClick(event) {
-    event.preventDefault();
     let x = Math.floor(mX / (width / w));
     let y = Math.floor(mY / (height / h));
 
@@ -53,7 +52,8 @@ canvas.addEventListener('click', function (event) {
     handleClick(event);
 }, false);
 canvas.addEventListener('contextmenu', function (event) {
-    handleClick(event);
+    event.preventDefault();
+    handleLeftClick(event);
     return false;
 }, false);
 canvas.addEventListener('mousemove', function (event) {
@@ -66,7 +66,8 @@ sidebar.addEventListener('click', function (event) {
     handleClick(event);
 }, false);
 sidebar.addEventListener('contextmenu', function (event) {
-    handleClick(event);
+    event.preventDefault();
+    handleLeftClick(event);
     return false;
 }, false);
 sidebar.addEventListener('mousemove', function (event) {
@@ -79,47 +80,43 @@ window.addEventListener("beforeunload", function (event) {
 });
 
 
-let ws;
-
-function buildwebsocket() {
-    let HOST = window.origin.replace(/^http/, 'ws')
-    ws = new WebSocket(HOST);
-    ws.onopen = (evt) => {
-        console.log('Connected');
-    };
-    ws.onclose = (evt) => {
-        send(ID);
-        console.log('Connection closed');
-    };
-    ws.onmessage = (evt) => {
-        if (evt.data[0] == 1) {
-            console.log("win");
-            context.fillStyle = "#000000";
-            let size = Math.min(width / 3, height / 3);
-            context.font = size + "px Comic Sans MS";
-            context.fillText("You Win!", 0, height);
-            setTimeout(function () { send('') }, 3000);
-        } else if (evt.data[0] == 0) {
-            console.log("lose");
-            context.fillStyle = "#000000";
-            let size = Math.min(width / 3, height / 3);
-            context.font = size + "px Comic Sans MS";
-            context.fillText("You Lose!", 0, height);
-            setTimeout(function () { send('') }, 3000);
-        } else if (evt.data[0] == 'c') {
-            playercount = event.data.replace('c', '');
-            setTimeout(function () { draw(array, playercount, width, height, w, h) }, 50);
-        } else if (evt.data[0] + evt.data[1] == 'ID') {
-            ID = evt.data.replace('ID', '');
-        } else {
-            array = JSON.parse(evt.data);
-            setTimeout(function () { draw(array, playercount, width, height, w, h) }, 50);
-        }
-    };
-    ws.onerror = (evt) => { console.log('Connection error'); };
-}
-
-buildwebsocket();
+let HOST = window.origin.replace(/^http/, 'ws')
+let ws = new WebSocket(HOST);
+ws.onopen = (evt) => {
+    console.log('Connected');
+};
+ws.onclose = (evt) => {
+    send(ID);
+    console.log('Connection closed');
+};
+ws.onmessage = (evt) => {
+    if (evt.data[0] == 1) {
+        console.log("win");
+        context.fillStyle = "#000000";
+        let size = Math.min(width / 3, height / 3);
+        context.font = size + "px Comic Sans MS";
+        context.textAlign = 'center';
+        context.fillText("You Win!", width / 2, height);
+        setTimeout(function () { send('') }, 3000);
+    } else if (evt.data[0] == 0) {
+        console.log("lose");
+        context.fillStyle = "#000000";
+        let size = Math.min(width / 3, height / 3);
+        context.font = size + "px Comic Sans MS";
+        context.textAlign = 'center';
+        context.fillText("You Lose!", width / 2, height);
+        setTimeout(function () { send('') }, 3000);
+    } else if (evt.data[0] == 'c') {
+        playercount = event.data.replace('c', '');
+        setTimeout(function () { draw(array, playercount, width, height, w, h) }, 50);
+    } else if (evt.data[0] + evt.data[1] == 'ID') {
+        ID = evt.data.replace('ID', '');
+    } else {
+        array = JSON.parse(evt.data);
+        setTimeout(function () { draw(array, playercount, width, height, w, h) }, 50);
+    }
+};
+ws.onerror = (evt) => { console.log('Connection error'); };
 
 function send(message) {
     ws.send(message);

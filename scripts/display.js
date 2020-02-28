@@ -34,7 +34,7 @@ function draw(arr, playercount, width, height, w, h) {
     //draw squares
     for (let i = 0; i < w; i++) {
         for (let j = 0; j < h; j++) {
-            switch (arr[i + (j * w)]) {
+            switch (arr[i][j]) {
                 case 0:
                     context.drawImage(empty, i * width / w, j * height / h, width / w, height / h);
                     break;
@@ -72,10 +72,8 @@ function draw(arr, playercount, width, height, w, h) {
         }
     }
 
-    //draw separating lines
     lines(width, height, w, h);
 
-    //draw game info
     info(playercount);
 }
 

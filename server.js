@@ -44,12 +44,17 @@ wss = new WebSocketServer({
 //array for connections
 let connections = [];
 let connectionIDs = [];
+let connectionScores = [];
 
-let arr = []; // 0 is unclicked and not mine, 1 is clicked, 2 is unclicked and mine, 3 is flag, 4 is flagged mine
 let width = 32;
 let height = 18;
-arr.length = width * height;
-let mines = arr.length / 5;
+let arr = []; // 0 is unclicked and not mine, 1 is clicked, 2 is unclicked and mine, 3 is flag, 4 is flagged mine
+arr.length = width;
+for (let i = 0; i < arr.length; i++) {
+    arr[i] = [];
+    arr[i].length = height;
+}
+let mines = width * height / 5;
 mine.reset(arr, mines);
 
 //update clients after any change to the board
@@ -66,6 +71,7 @@ function updateClients(message) {
                 if (message.replace('D', '') == connectionIDs[i]) {
                     connections.splice(i, 1);
                     connectionIDs.splice(i, 1);
+                    connectionScores.splice(i, 1);
                 }
             }
             for (let i = 0; i < connections.length; i++) {
@@ -78,8 +84,8 @@ function updateClients(message) {
             }
             let xy = message.split(':');
             let output = mine.updateArr(arr, Number(xy[0]), Number(xy[1]), flagging, width, height);
-            if (output[0] == 100) win = true;
-            else if (output[0] == -100) lose = true;
+            if (output[0][0] == 100) win = true;
+            else if (output[0][0] == -100) lose = true;
             else {
                 arr = output;
             }
@@ -104,6 +110,7 @@ wss.on('request', (request) => {
 
     connections.push(connection);
     connectionIDs.push(ID);
+    connectionScores.push(0);
 
     connection.sendUTF('ID' + ID);
     connection.sendUTF(JSON.stringify(mine.returnArr(arr, width, height)));
