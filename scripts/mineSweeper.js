@@ -5,15 +5,26 @@ exports.reset = function (arr, mines) {
             arr[i][j] = 0;
         }
     }
-    for (let i = 0; i < mines; i++) {
-        iX = Math.floor(Math.random() * arr.length);
-        iY = Math.floor(Math.random() * arr[0].length);
-        if (arr[iX][iY] == 2) {
-            i--;
-        } else {
-            arr[iY][iX] = 2;
+    let totalMines = 0;
+    do {
+        for (let i = 0; i < (mines - totalMines); i++) {
+            iX = Math.floor(Math.random() * (arr.length - 1));
+            iY = Math.floor(Math.random() * (arr[0].length - 1));
+            if (arr[iX][iY] == 2) {
+                i--;
+                continue;
+            }
+            arr[iX][iY] = 2;
         }
-    }
+        totalMines = 0;
+        for (let i = 0; i < arr.length; i++) {
+            for (let j = 0; j < arr[i].length; j++) {
+                if (arr[i][j] == 2) {
+                    totalMines++;
+                }
+            }
+        }
+    } while (totalMines < mines);
     return arr;
 }
 

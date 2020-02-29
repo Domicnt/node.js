@@ -54,43 +54,11 @@ for (let i = 0; i < arr.length; i++) {
     arr[i] = [];
     arr[i].length = height;
 }
-let mines = width * height / 5;
+let mines = width * height / 4;
 mine.reset(arr, mines);
 
 //update clients after any change to the board
-function updateClients(message) {
-    if (connections.length == 0) return;
-    let lose = false;
-    let win = false;
-
-    let flagging = false;
-    if (message != null) {
-        if (message[0] == 'D') {
-            //disconnect
-            for (let i = 0; i < connections.length; i++) {
-                if (message.replace('D', '') == connectionIDs[i]) {
-                    connections.splice(i, 1);
-                    connectionIDs.splice(i, 1);
-                    connectionScores.splice(i, 1);
-                }
-            }
-            for (let i = 0; i < connections.length; i++) {
-                connections[i].sendUTF('c' + connections.length);
-            }
-        } else {
-            if (message[0] == 'f') {
-                message = message.replace('f', '');
-                flagging = true
-            }
-            let xy = message.split(':');
-            let output = mine.updateArr(arr, Number(xy[0]), Number(xy[1]), flagging, width, height);
-            if (output[0][0] == 100) win = true;
-            else if (output[0][0] == -100) lose = true;
-            else {
-                arr = output;
-            }
-        }
-    }
+function updateClients(win, lose) {
     for (let i = 0; i < connections.length; i++) {
         if (lose) {
             connections[i].send(0);
@@ -100,6 +68,46 @@ function updateClients(message) {
             arr = mine.reset(arr, mines);
         } else {
             connections[i].sendUTF(JSON.stringify(mine.returnArr(arr, width, height)));
+        }
+    }
+}
+
+function parseMessage (message) {
+    let ID = message.substring(0, 10);//ID for client
+    let value = message.substring(10, 11);//What value is being passed
+    message = message.substring(11);//The message passed
+
+    for (let i = 0; i < connectionIDs.length; i++) {
+        if (connectionIDs[i] == ID) {
+            //client that sent the message
+            switch (value) {
+                case 'c':
+                    //click position
+                    let output = mine.updateArr(arr, Number(message.split(':')[0]), Number(message.split(':')[1]), false, width, height);
+                    let win = false;
+                    let lose = false;
+                    if (output[0][0] == 100) win = true;
+                    else if (output[0][0] == -100) lose = true;
+                    else {
+                        arr = output;
+                    }
+                    updateClients(win, lose);
+                    break;
+                case 'f':
+                    //flagging position
+                    arr = mine.updateArr(arr, Number(message.split(':')[0]), Number(message.split(':')[1]), true, width, height);
+                    updateClients(false, false);
+                    break;
+                case 'd':
+                    //disconnect
+                    connections.splice(i, 1);
+                    connectionIDs.splice(i, 1);
+                    connectionScores.splice(i, 1);
+                    for (let i = 0; i < connections.length; i++) {
+                        connections[i].sendUTF('c' + connections.length);
+                    }
+                    break;
+            }
         }
     }
 }
@@ -122,7 +130,7 @@ wss.on('request', (request) => {
     console.log('Connection accepted at ' + (new Date()));
     connection.on('message', (message) => {
         if (message.type === 'utf8') {
-            updateClients(message.utf8Data);
+            parseMessage(message.utf8Data);
         }
     });
 

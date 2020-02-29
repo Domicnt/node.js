@@ -7,8 +7,3 @@ exports.createID = function() {
     }
     return result;
 }
-
-//parse message from client
-exports.parseMessage = function(message, IDs) {
-
-}

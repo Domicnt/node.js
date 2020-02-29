@@ -36,16 +36,16 @@ function handleClick(event) {
 
     let message = x + ':' + y;
 
-    send(message);
+    send('c', message);
 }
 
 function handleLeftClick(event) {
     let x = Math.floor(mX / (width / w));
     let y = Math.floor(mY / (height / h));
 
-    let message = 'f' + x + ':' + y;
+    let message = x + ':' + y;
 
-    send(message);
+    send('f', message);
 }
 
 canvas.addEventListener('click', function (event) {
@@ -76,7 +76,7 @@ sidebar.addEventListener('mousemove', function (event) {
 }, false);
 
 window.addEventListener("beforeunload", function (event) {
-    send('D' + ID);
+    send('d', '');
 });
 
 
@@ -86,7 +86,6 @@ ws.onopen = (evt) => {
     console.log('Connected');
 };
 ws.onclose = (evt) => {
-    send(ID);
     console.log('Connection closed');
 };
 ws.onmessage = (evt) => {
@@ -118,8 +117,8 @@ ws.onmessage = (evt) => {
 };
 ws.onerror = (evt) => { console.log('Connection error'); };
 
-function send(message) {
-    ws.send(message);
+function send(value, message) {
+    ws.send(ID + value + message);
 }
 
 function close() {
