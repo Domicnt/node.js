@@ -61,13 +61,14 @@ mine.reset(arr, mines);
 function updateClients(win, lose) {
     for (let i = 0; i < connections.length; i++) {
         if (lose) {
-            connections[i].send(0);
+            connections[i].sendUTF('l');
             arr = mine.reset(arr, mines);
         } else if (win) {
-            connections[i].send(1);
+            connections[i].sendUTF('w');
             arr = mine.reset(arr, mines);
         } else {
             connections[i].sendUTF(JSON.stringify(mine.returnArr(arr, width, height)));
+            connections[i].sendUTF('s' + JSON.stringify(connectionScores));
         }
     }
 }
@@ -90,6 +91,9 @@ function parseMessage (message) {
                     else if (output[0][0] == -100) lose = true;
                     else {
                         arr = output;
+                    }
+                    if (!lose) {
+                        connectionScores[i]++;
                     }
                     updateClients(win, lose);
                     break;
@@ -120,7 +124,8 @@ wss.on('request', (request) => {
     connectionIDs.push(ID);
     connectionScores.push(0);
 
-    connection.sendUTF('ID' + ID);
+    connection.sendUTF('i' + ID);
+    connection.sendUTF('s' + JSON.stringify(connectionScores));
     connection.sendUTF(JSON.stringify(mine.returnArr(arr, width, height)));
 
     for (let i = 0; i < connections.length; i++) {

@@ -14,6 +14,7 @@ let win = false;
 let lose = false;
 
 let playercount;
+let scores = [];
 
 let array = [];
 
@@ -89,30 +90,48 @@ ws.onclose = (evt) => {
     console.log('Connection closed');
 };
 ws.onmessage = (evt) => {
-    if (evt.data[0] == 1) {
-        console.log("win");
-        context.fillStyle = "#000000";
-        let size = Math.min(width / 3, height / 3);
-        context.font = size + "px Comic Sans MS";
-        context.textAlign = 'center';
-        context.fillText("You Win!", width / 2, height);
-        setTimeout(function () { send('') }, 3000);
-    } else if (evt.data[0] == 0) {
-        console.log("lose");
-        context.fillStyle = "#000000";
-        let size = Math.min(width / 3, height / 3);
-        context.font = size + "px Comic Sans MS";
-        context.textAlign = 'center';
-        context.fillText("You Lose!", width / 2, height);
-        setTimeout(function () { send('') }, 3000);
-    } else if (evt.data[0] == 'c') {
-        playercount = event.data.replace('c', '');
-        setTimeout(function () { draw(array, playercount, width, height, w, h) }, 50);
-    } else if (evt.data[0] + evt.data[1] == 'ID') {
-        ID = evt.data.replace('ID', '');
-    } else {
-        array = JSON.parse(evt.data);
-        setTimeout(function () { draw(array, playercount, width, height, w, h) }, 50);
+    switch (evt.data[0]) {
+        case 'l':
+            //lose
+            //clear screen
+            context.fillStyle = "#FFFFFF";
+            context.fillRect(0, 0, width, height);
+            context.fillStyle = "#000000";
+            context.font = Math.min(width / 3, height / 3) + "px Comic Sans MS";
+            context.textAlign = 'center';
+            context.fillText("You Lose!", width / 2, height / 2 + height / 6);
+            setTimeout(function () { send('') }, 3000);
+            break;
+        case 'w':
+            //win
+            //clear screen
+            context.fillStyle = "#FFFFFF";
+            context.fillRect(0, 0, width, height);
+            context.fillStyle = "#000000";
+            context.font = Math.min(width / 3, height / 3) + "px Comic Sans MS";
+            context.textAlign = 'center';
+            context.fillText("You Win!", width / 2, height);
+            setTimeout(function () { send('') }, 3000);
+            break;
+        case 'i':
+            //identicifation
+            ID = evt.data.replace('i', '');
+            break;
+        case 'c':
+            //connection amount
+            playercount = event.data.replace('c', '');
+            setTimeout(function () { draw(array, playercount, scores, width, height, w, h) }, 50);
+            break;
+        case 's':
+            //scores
+            scores = JSON.parse(event.data.replace('s', ''));
+            setTimeout(function () { draw(array, playercount, scores, width, height, w, h) }, 50);
+            break;
+        default:
+            //update array
+            array = JSON.parse(evt.data);
+            setTimeout(function () { draw(array, playercount, scores, width, height, w, h) }, 50);
+            break;
     }
 };
 ws.onerror = (evt) => { console.log('Connection error'); };

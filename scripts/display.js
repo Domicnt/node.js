@@ -26,7 +26,11 @@ let eight = new Image();
 eight.src = 'images/8.png';
 
 //draw the board
-function draw(arr, playercount, width, height, w, h) {
+function draw(arr, playercount, scores, width, height, w, h) {
+    if (arr.length != w || arr[0].length != h) {
+        return;
+    }
+
     //clear screen
     context.fillStyle = "#FFFFFF";
     context.fillRect(0, 0, width, height);
@@ -68,13 +72,16 @@ function draw(arr, playercount, width, height, w, h) {
                 case 10:
                     context.drawImage(flag, i * width / w, j * height / h, width / w, height / h);
                     break;
+                default:
+                    context.drawImage(blank, i * width / w, j * height / h, width / w, height / h);
+                    break;
             }
         }
     }
 
     lines(width, height, w, h);
 
-    info(playercount);
+    info(playercount, scores);
 }
 
 //draw lines between squares
@@ -98,11 +105,14 @@ function lines(width, height, w, h) {
 }
 
 //draw info about the game - amount of players etc
-function info(playercount) {
+function info(playercount, scores) {
     let sidebarText = document.getElementById('sidebarText');
     if (playercount == 1) {
         sidebarText.innerHTML = playercount + " Player Connected.";    
     } else {
         sidebarText.innerHTML = playercount + " Players Connected.";    
+    }
+    for (let i = 0; i < Math.min(scores.length, 5); i++) {
+        sidebarText.innerHTML += "<br> Player " + (i + 1) + "'s score: " + scores[i];
     }
 }
