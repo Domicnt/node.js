@@ -19,6 +19,7 @@ let scores = [];
 let array = [];
 
 let ID = '';
+let num = 0;
 
 let mX = width;
 let mY = height;
@@ -93,7 +94,6 @@ ws.onmessage = (evt) => {
     switch (evt.data[0]) {
         case 'l':
             //lose
-            //clear screen
             context.fillStyle = "#FFFFFF";
             context.fillRect(0, 0, width, height);
             context.fillStyle = "#000000";
@@ -104,7 +104,6 @@ ws.onmessage = (evt) => {
             break;
         case 'w':
             //win
-            //clear screen
             context.fillStyle = "#FFFFFF";
             context.fillRect(0, 0, width, height);
             context.fillStyle = "#000000";
@@ -117,20 +116,24 @@ ws.onmessage = (evt) => {
             //identicifation
             ID = evt.data.replace('i', '');
             break;
+        case 'n':
+            //player number
+            num = Number(evt.data.replace('n', ''));
+            break;
         case 'c':
             //connection amount
             playercount = event.data.replace('c', '');
-            setTimeout(function () { draw(array, playercount, scores, width, height, w, h) }, 50);
+            setTimeout(function () { draw(array, playercount, scores, num, width, height, w, h) }, 50);
             break;
         case 's':
             //scores
             scores = JSON.parse(event.data.replace('s', ''));
-            setTimeout(function () { draw(array, playercount, scores, width, height, w, h) }, 50);
+            setTimeout(function () { draw(array, playercount, scores, num, width, height, w, h) }, 50);
             break;
         default:
             //update array
             array = JSON.parse(evt.data);
-            setTimeout(function () { draw(array, playercount, scores, width, height, w, h) }, 50);
+            setTimeout(function () { draw(array, playercount, scores, num, width, height, w, h) }, 50);
             break;
     }
 };

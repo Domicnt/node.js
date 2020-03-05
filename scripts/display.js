@@ -26,7 +26,7 @@ let eight = new Image();
 eight.src = 'images/8.png';
 
 //draw the board
-function draw(arr, playercount, scores, width, height, w, h) {
+function draw(arr, playercount, scores, num, width, height, w, h) {
     if (arr.length != w || arr[0].length != h) {
         return;
     }
@@ -81,7 +81,7 @@ function draw(arr, playercount, scores, width, height, w, h) {
 
     lines(width, height, w, h);
 
-    info(playercount, scores);
+    info(playercount, scores, num);
 }
 
 //draw lines between squares
@@ -105,14 +105,15 @@ function lines(width, height, w, h) {
 }
 
 //draw info about the game - amount of players etc
-function info(playercount, scores) {
+function info(playercount, scores, num) {
     let sidebarText = document.getElementById('sidebarText');
+    sidebarText.innerHTML = "You are player #" + num + "<br>";
     if (playercount == 1) {
-        sidebarText.innerHTML = playercount + " Player Connected.";    
+        sidebarText.innerHTML += playercount + " Player Connected.";    
     } else {
-        sidebarText.innerHTML = playercount + " Players Connected.";    
+        sidebarText.innerHTML += playercount + " Players Connected.";    
     }
-    for (let i = 0; i < Math.min(scores.length, 5); i++) {
+    for (let i = 0; i < Math.min(scores.length, 10); i++) {
         sidebarText.innerHTML += "<br> Player " + (i + 1) + "'s score: " + scores[i];
     }
 }
