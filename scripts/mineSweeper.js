@@ -94,7 +94,7 @@ exports.updateArr = function(arr, x, y, flagging, width, height) {
 }
 
 //return an array of all information that the client should have
-exports.returnArr = function(arr, width, height) {
+exports.returnArr = function(arr, width, height, lose) {
     let returnArr = []; // 0 is unclicked and not mine, 1 is clicked, 2 is unclicked and mine, 3 is flag, 4 is flagged mine
     returnArr.length = width;
     for (let i = 0; i < returnArr.length; i++) {
@@ -110,7 +110,11 @@ exports.returnArr = function(arr, width, height) {
             //0-8 is how many adjacent mines, 9 is unclicked tile, 10 is flag
             if (arr[i][j] == 1) returnArr[i][j] = exports.adjacentMines(i, j, arr, width, height);
             else if (arr[i][j] == 3 || arr[i][j] == 4) returnArr[i][j] = 10;
-            else returnArr[i][j] = 9;
+            else if (arr[i][j] == 2) {
+                if (!lose) {
+                    returnArr[i][j] = 9;
+                }
+            } else returnArr[i][j] = 9;
         }
     }
 

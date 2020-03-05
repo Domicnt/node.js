@@ -94,23 +94,19 @@ ws.onmessage = (evt) => {
     switch (evt.data[0]) {
         case 'l':
             //lose
-            context.fillStyle = "#FFFFFF";
-            context.fillRect(0, 0, width, height);
+            draw(array, playercount, scores, num, width, height, w, h);
             context.fillStyle = "#000000";
-            context.font = Math.min(width / 3, height / 3) + "px Comic Sans MS";
+            context.font = Math.min(width / 5, height / 2) + "px Comic Sans MS";
             context.textAlign = 'center';
-            context.fillText("You Lose!", width / 2, height / 2 + height / 6);
-            setTimeout(function () { send('') }, 3000);
+            setTimeout(function () { context.fillText("You Lose!", width / 2, height / 2 + Math.min(width / 5, height / 2) / 2); }, 50);
             break;
         case 'w':
             //win
-            context.fillStyle = "#FFFFFF";
-            context.fillRect(0, 0, width, height);
+            draw(array, playercount, scores, num, width, height, w, h);
             context.fillStyle = "#000000";
-            context.font = Math.min(width / 3, height / 3) + "px Comic Sans MS";
+            context.font = Math.min(width / 5, height / 2) + "px Comic Sans MS";
             context.textAlign = 'center';
-            context.fillText("You Win!", width / 2, height);
-            setTimeout(function () { send('') }, 3000);
+            setTimeout(function () { context.fillText("You Win!", width / 2, height / 2 + Math.min(width / 5, height / 2) / 2); }, 50);
             break;
         case 'i':
             //identicifation

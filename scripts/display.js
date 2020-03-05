@@ -24,6 +24,8 @@ let seven = new Image();
 seven.src = 'images/7.png';
 let eight = new Image();
 eight.src = 'images/8.png';
+let mine = new Image();
+mine.src = 'images/mine.png';
 
 //draw the board
 function draw(arr, playercount, scores, num, width, height, w, h) {
@@ -73,7 +75,7 @@ function draw(arr, playercount, scores, num, width, height, w, h) {
                     context.drawImage(flag, i * width / w, j * height / h, width / w, height / h);
                     break;
                 default:
-                    context.drawImage(blank, i * width / w, j * height / h, width / w, height / h);
+                    context.drawImage(mine, i * width / w, j * height / h, width / w, height / h);
                     break;
             }
         }

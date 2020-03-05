@@ -61,16 +61,20 @@ mine.reset(arr, mines);
 function updateClients(win, lose) {
     for (let i = 0; i < connections.length; i++) {
         if (lose) {
-            connectionScores[i] = 0;
+            connections[i].sendUTF(JSON.stringify(mine.returnArr(arr, width, height, true)));
             connections[i].sendUTF('l');
-            arr = mine.reset(arr, mines);
         } else if (win) {
-            connectionScores[i] = 0;
+            connections[i].sendUTF(JSON.stringify(mine.returnArr(arr, width, height, false)));
             connections[i].sendUTF('w');
-            arr = mine.reset(arr, mines);
         } else {
-            connections[i].sendUTF(JSON.stringify(mine.returnArr(arr, width, height)));
+            connections[i].sendUTF(JSON.stringify(mine.returnArr(arr, width, height, false)));
             connections[i].sendUTF('s' + JSON.stringify(connectionScores));
+        }
+    }
+    if (lose || win) {
+        arr = mine.reset(arr, mines);
+        for (let i = 0; i < connections.length; i++) {
+            connectionScores[i] = 0;
         }
     }
 }
